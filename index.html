@@ -9,7 +9,7 @@
   <style>
     html {
       font-family: sans-serif;
-      font-size: 1.2rem;
+      font-size: 1.2em;
       line-height: 1.5
     }
 
@@ -20,6 +20,7 @@
     }
 
     header, footer {
+      box-sizing: border-box;
       width: 100%;
       background: white;
       position: static;
@@ -48,7 +49,8 @@
 
     .parosito .img {
       position: relative;
-      margin: 1rem;
+      margin: 1%;
+      width: 31%;
     }
     .parosito .img figcaption {
       position: absolute;
@@ -61,8 +63,10 @@
       color: white;
     }
     .parosito .txt {
+      flex-grow: 1;
+      max-width: 31%;
+      margin: 2% 1%;
       outline: solid 2px white;
-      min-width: 15rem;
       text-align: center;
       background: orange;
       color: white;
@@ -72,6 +76,22 @@
       outline: solid 2px white;
       max-width: 100%;
     }
+
+    @media screen and (orientation:portrait) {
+      .parosito .img {
+        margin: 1%;
+        width: 46%;
+      }
+      .parosito .txt {
+        margin: 1%;
+        width: 46%;
+      }
+    }
+
+    .parosito .img .txt {
+      max-width: unset;
+      width: unset;
+    }
   </style>
 </head>
 <body>
@@ -80,31 +100,29 @@
     <p>Nem vagyunk "bezárva" egy képernyőbe, mint a projektoron! Scrollozhatunk! Drag & drop! Select & pair!</p>
   </header>
 
-  <main>
-    <div id="questions">
-      <div class="parosito" id="dragdrop" ondrop="_drop(event)" ondragstart="_drag(event)">
-        <div class="qs" ondragover="_allow_drop(event)">
-          <figure class="img" onclick="_focusFig(this)">
-            <img src="http://lorempixel.com/400/300/"><figcaption>1</figcaption></figure>
-          <figure class="img" onclick="_focusFig(this)">
-            <img src="http://lorempixel.com/400/300/"><figcaption>2</figcaption>
-          </figure>
-          <figure class="img" onclick="_focusFig(this)">
-            <img src="http://lorempixel.com/400/300/"><figcaption>3</figcaption>
-          </figure>
-          <figure class="img" onclick="_focusFig(this)">
-            <img src="http://lorempixel.com/400/300/"><figcaption>4</figcaption>
-          </figure>
-          <figure class="img" onclick="_focusFig(this)">
-            <img src="http://lorempixel.com/400/300/"><figcaption>5</figcaption>
-          </figure>
-        </div>
-        <p draggable="true" class="txt" id="txt-1" onclick="_moveTxt(this)">A válasz</p>
-        <p draggable="true" class="txt" id="txt-2" onclick="_moveTxt(this)">B válasz</p>
-        <p draggable="true" class="txt" id="txt-3" onclick="_moveTxt(this)">C válasz</p>
-        <p draggable="true" class="txt" id="txt-4" onclick="_moveTxt(this)">D válasz</p>
-        <p draggable="true" class="txt" id="txt-5" onclick="_moveTxt(this)">E válasz</p>
+  <main id="questions">
+    <div class="parosito" id="dragdrop" ondrop="_drop(event)" ondragstart="_drag(event)">
+      <div class="qs" ondragover="_allow_drop(event)" onclick="_blurFig(event)">
+        <figure class="img" onclick="event.cancelBubble=true;_focusFig(this);">
+          <img src="http://lorempixel.com/400/300/city"><figcaption>1</figcaption></figure>
+        <figure class="img" onclick="event.cancelBubble=true;_focusFig(this);">
+          <img src="http://lorempixel.com/400/300/transport"><figcaption>2</figcaption>
+        </figure>
+        <figure class="img" onclick="event.cancelBubble=true;_focusFig(this);">
+          <img src="http://lorempixel.com/400/300/animals"><figcaption>3</figcaption>
+        </figure>
+        <figure class="img" onclick="event.cancelBubble=true;_focusFig(this);">
+          <img src="http://lorempixel.com/400/300/nature"><figcaption>4</figcaption>
+        </figure>
+        <figure class="img" onclick="event.cancelBubble=true;_focusFig(this);">
+          <img src="http://lorempixel.com/400/300/people"><figcaption>5</figcaption>
+        </figure>
       </div>
+      <p draggable="true" class="txt" id="txt-1" onclick="_moveTxt(this)">A) PEOPLE</p>
+      <p draggable="true" class="txt" id="txt-2" onclick="_moveTxt(this)">B) NATURE</p>
+      <p draggable="true" class="txt" id="txt-3" onclick="_moveTxt(this)">C) ANIMALS</p>
+      <p draggable="true" class="txt" id="txt-4" onclick="_moveTxt(this)">D) TRANSPORT</p>
+      <p draggable="true" class="txt" id="txt-5" onclick="_moveTxt(this)">E) CITY</p>
     </div>
   </main>
   <footer>
@@ -115,12 +133,26 @@
     let target;
 
     function _focusFig(el) {
+      console.log('focus', el.parentNode)
+      /* ev.cancelBubble = true;
+      ev.preventDefault(); */
       let old = el.parentNode.querySelectorAll('img')
       for (o of old) {
         o.style.outline = 'solid 2px white'
       }
       el.querySelector('img').style.outline = 'dashed 4px white'
       target = el;
+    }
+
+    function _blurFig(ev) {
+      console.log('blur', ev.target)
+      ev.cancelBubble = true;
+      ev.preventDefault();
+      let old = ev.target.querySelectorAll('img')
+      for (o of old) {
+        o.style.outline = 'solid 2px white'
+      }
+      target = null
     }
 
     function _moveTxt(el) {
@@ -140,7 +172,6 @@
     }
 
     function _allow_drop(ev) {
-      console.log('allow', ev.target)
       ev.preventDefault();
       if (ev.target.tagName == 'FIGURE') {
         _focusFig(ev.target)
