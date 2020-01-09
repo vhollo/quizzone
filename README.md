@@ -1,4 +1,4 @@
 # quizzone
 fejlesztjük!
 
-https://yellobelloteam.github.io/quizzone/
+https://quizzone-hu.netlify.com/
