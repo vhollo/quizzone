@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    html {
+      font-family: sans-serif;
+      font-size: 1.2em;
+      line-height: 1.5
+    }
+
+    body {
+      height: 100%;
+      margin: 0;
+      background: dimgrey;
+    }
+
+    header, footer {
+      box-sizing: border-box;
+      width: 100%;
+      background: white;
+      position: static;
+      padding: 0 1rem;
+    }
+    header {
+      top: 0;
+      height: 20%;
+    }
+    footer {
+      bottom: 0;
+      height: 10%;
+    }
+
+    #questions {
+      padding: 4rem 0 4rem;
+    }
+
+    .parosito .qs, .parosito{
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      border-bottom: dashed 2px white;
+    }
+
+    .parosito .img {
+      position: relative;
+      margin: 1%;
+      width: 31%;
+    }
+    .parosito .img figcaption {
+      position: absolute;
+      left: -.5rem;
+      top: 1rem;
+      outline: solid 2px white;
+      width: 2rem;
+      text-align: center;
+      background: orange;
+      color: white;
+    }
+    .parosito .txt {
+      flex-grow: 1;
+      max-width: 31%;
+      margin: 2% 1%;
+      outline: solid 2px white;
+      text-align: center;
+      background: orange;
+      color: white;
+    }
+
+    #questions img {
+      outline: solid 2px white;
+      max-width: 100%;
+    }
+
+    @media screen and (orientation:portrait) {
+      .parosito .img {
+        margin: 1%;
+        width: 46%;
+      }
+      .parosito .txt {
+        margin: 1%;
+        width: 46%;
+      }
+    }
+
+    .parosito .img .txt {
+      max-width: unset;
+      width: unset;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Quizzone experiment</h1>
+    <p>Nem vagyunk "bezárva" egy képernyőbe, mint a projektoron! Scrollozhatunk! Drag & drop! Select & pair!</p>
+  </header>
+
+  <main id="questions">
+    <div class="parosito" id="dragdrop" ondrop="_drop(event)" ondragstart="_drag(event)">
+      <div class="qs" ondragover="_allow_drop(event)" onclick="_blurFig(event)">
+        <figure class="img" onclick="event.cancelBubble=true;_focusFig(this);">
+          <img src="http://lorempixel.com/400/300/city"><figcaption>1</figcaption></figure>
+        <figure class="img" onclick="event.cancelBubble=true;_focusFig(this);">
+          <img src="http://lorempixel.com/400/300/transport"><figcaption>2</figcaption>
+        </figure>
+        <figure class="img" onclick="event.cancelBubble=true;_focusFig(this);">
+          <img src="http://lorempixel.com/400/300/animals"><figcaption>3</figcaption>
+        </figure>
+        <figure class="img" onclick="event.cancelBubble=true;_focusFig(this);">
+          <img src="http://lorempixel.com/400/300/nature"><figcaption>4</figcaption>
+        </figure>
+        <figure class="img" onclick="event.cancelBubble=true;_focusFig(this);">
+          <img src="http://lorempixel.com/400/300/people"><figcaption>5</figcaption>
+        </figure>
+      </div>
+      <p draggable="true" class="txt" id="txt-1" onclick="_moveTxt(this)">A) PEOPLE</p>
+      <p draggable="true" class="txt" id="txt-2" onclick="_moveTxt(this)">B) NATURE</p>
+      <p draggable="true" class="txt" id="txt-3" onclick="_moveTxt(this)">C) ANIMALS</p>
+      <p draggable="true" class="txt" id="txt-4" onclick="_moveTxt(this)">D) TRANSPORT</p>
+      <p draggable="true" class="txt" id="txt-5" onclick="_moveTxt(this)">E) CITY</p>
+    </div>
+  </main>
+  <footer>
+    <h6>2020. január</h6>
+  </footer>
+
+  <script>
+    let target;
+
+    function _focusFig(el) {
+      //console.log('focus', el.parentNode)
+      /* ev.cancelBubble = true;
+      ev.preventDefault(); */
+      let old = el.parentNode.querySelectorAll('img')
+      for (o of old) {
+        o.style.outline = 'solid 2px white'
+      }
+      el.querySelector('img').style.outline = 'dashed 4px white'
+      target = el;
+    }
+
+    function _blurFig(ev) {
+      //console.log('blur', ev.target)
+      ev.cancelBubble = true;
+      ev.preventDefault();
+      let old = ev.target.querySelectorAll('img')
+      for (o of old) {
+        o.style.outline = 'solid 2px white'
+      }
+      target = null
+    }
+
+    function _moveTxt(el) {
+      if (target && target.tagName == 'FIGURE') {
+        let old = target.querySelector('p');
+        if (old) {
+          document.getElementById('dragdrop').appendChild(old);
+        }
+        if (old != el) {
+          target.appendChild(el);
+          if (target.nextElementSibling) _focusFig(target.nextElementSibling)
+          else _focusFig(target.parentNode.firstElementChild)
+        }
+      } else {
+        document.getElementById('dragdrop').appendChild(el);
+      }
+    }
+
+    function _allow_drop(ev) {
+      ev.preventDefault();
+      if (ev.target.tagName == 'FIGURE') {
+        _focusFig(ev.target)
+      }
+      let target = ev.target.parentNode;
+      if (target.tagName == 'FIGURE') {
+        _focusFig(target)
+      }
+    }
+    
+    function _drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.id);
+      //console.log('data', ev.target.id)
+    }
+    
+    function _drop(ev) {
+      ev.preventDefault();
+      //let data = ev.dataTransfer.getData("text");
+      let el = document.getElementById(ev.dataTransfer.getData("text"));
+      if (el && el.tagName == 'P') {
+        let target = ev.target.parentNode;
+        //console.log(target.tagName)
+        if (target.tagName == 'FIGURE') {
+          let old = target.querySelector('p');
+          if (old) document.getElementById('dragdrop').appendChild(old);
+          target.appendChild(el);
+        } else {
+          document.getElementById('dragdrop').appendChild(el);
+        }
+      }
+    }
+  </script>
+</body>
